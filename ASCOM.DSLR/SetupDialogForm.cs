@@ -134,6 +134,7 @@ namespace ASCOM.DSLR
             cbIntegrationApi.Items.Add(ConnectionMethod.Nikon);
             cbIntegrationApi.Items.Add(ConnectionMethod.Pentax);
             cbIntegrationApi.Items.Add(ConnectionMethod.NikonLegacy);
+            cbIntegrationApi.Items.Add(ConnectionMethod.PentaxSDK);
             SetSelectedItem(cbIntegrationApi, Settings.IntegrationApi);
             
 
@@ -271,6 +272,7 @@ namespace ASCOM.DSLR
             cbShutterPort.Visible = isDigiCamControl;
             bool isCanon = IsCanon();
             bool isPentax = IsPentax();
+            bool isPentaxSDK = IsPentaxSDK();
             if (isCanon || isNikonSDK)
             {
                 chkEnableLiveView.Visible = true;
@@ -283,6 +285,10 @@ namespace ASCOM.DSLR
                 chkEnableLiveView.Visible = false;
                 lblLiveViewZoom.Visible = false;
                 cbLiveViewZoom.Visible = false;
+            }
+            if(isPentaxSDK)
+            {
+                chkEnableLiveView.Visible = true;
             }
         }
 
@@ -309,6 +315,11 @@ namespace ASCOM.DSLR
         private bool IsNikonSDK()
         {
             return cbIntegrationApi.SelectedItem != null && (ConnectionMethod)cbIntegrationApi.SelectedItem == ConnectionMethod.Nikon;
+        }
+
+        private bool IsPentaxSDK()
+        {
+            return cbIntegrationApi.SelectedItem != null && (ConnectionMethod)cbIntegrationApi.SelectedItem == ConnectionMethod.PentaxSDK;
         }
 
         private void chkUseExternalShutter_CheckedChanged(object sender, EventArgs e)

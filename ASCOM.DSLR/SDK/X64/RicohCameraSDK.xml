@@ -1,0 +1,1569 @@
+<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>RicohCameraSDK</name>
+  </assembly>
+  <members>
+    <member name="T:Ricoh.CameraController.DeviceInterface">
+      <summary>Type of device interface.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.CameraDevice">
+      <summary>Class for getting information of a camera device or operating a camera device.</summary>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.Connect(Ricoh.CameraController.DeviceInterface)">
+      <summary>Connect with the specified device interface.</summary>
+      <param name="deviceInterface">Type of device interface</param>
+      <returns>Connection success or failure</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.Disconnect(Ricoh.CameraController.DeviceInterface)">
+      <summary>Disconnect with the specified device interface.</summary>
+      <param name="deviceInterface">Type of device interface</param>
+      <returns>Disconnection success or failure</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.Equals(System.Object)">
+      <summary>Evaluate whether it is the same device.</summary>
+      <param name="obj">Comparison</param>
+      <returns>Evaluation results</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.IsConnected(Ricoh.CameraController.DeviceInterface)">
+      <summary>Get connection status with the camera.</summary>
+      <param name="deviceInterface">Type of device interface</param>
+      <returns>Returns true during connection.</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.StartLiveView">
+      <summary>Start live view.</summary>
+      <returns>Response to request</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.StopLiveView">
+      <summary>Stop live view.</summary>
+      <returns>Response to request</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.Focus">
+      <summary>Focus the camera.</summary>
+      <returns>Response to request</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.Focus(System.Int32)">
+      <summary>Focus the camera by adjustment.</summary>
+      <param name="adjustment">Adjustment</param>
+      <returns>Response to request</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.Focus(System.Windows.Vector)">
+      <summary>Focus the camera with focus point.</summary>
+      <param name="focusPoint">Focus point</param>
+      <returns>Response to request</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.StartCapture(System.Boolean)">
+      <summary>Start capture.</summary>
+      <param name="withFocus">Focus the camera before capture. Default value is True</param>
+      <returns>Response result and capture object</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.StartCapture(System.Windows.Vector)">
+      <summary>Start capture with focus point.</summary>
+      <param name="focusPoint">Focus point</param>
+      <returns>Response result and capture object</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.StopCapture">
+      <summary>Stop capture.</summary>
+      <returns>Response to request</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.GetCaptureSettings(System.Collections.Generic.List{Ricoh.CameraController.CaptureSetting})">
+      <summary>Get the capture setting of the camera.</summary>
+      <param name="settings">Specify the capture setting you want to get. Result is saved here</param>
+      <returns>Response to request</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.SetCaptureSettings(System.Collections.Generic.List{Ricoh.CameraController.CaptureSetting})">
+      <summary>Set the capture setting of the camera.</summary>
+      <param name="settings">Specify the capture setting you want to set</param>
+      <returns>Response to request</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.GetCameraDeviceSettings(System.Collections.Generic.List{Ricoh.CameraController.CameraDeviceSetting})">
+      <summary>Get the camera device setting.</summary>
+      <param name="settings">Specify the camera device setting you want to get. Result is saved here</param>
+      <returns>Response to request</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDevice.SetCameraDeviceSettings(System.Collections.Generic.List{Ricoh.CameraController.CameraDeviceSetting})">
+      <summary>Set the camera device setting.</summary>
+      <param name="settings">Specify the camera device setting you want to set</param>
+      <returns>Response to request</returns>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraDevice.Manufacturer">
+      <summary>Manufacturer name.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraDevice.Model">
+      <summary>Model name.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraDevice.SerialNumber">
+      <summary>Serial number.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraDevice.FirmwareVersion">
+      <summary>Firmware version.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraDevice.EventListeners">
+      <summary>Registered camera event listener.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraDevice.Status">
+      <summary>Camera status.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraDevice.Storages">
+      <summary>Information on the storage of the camera.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraDevice.Images">
+      <summary>Image information list. Image list is updated automatically while connected in the background.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.CameraEventListener">
+      <summary>Event listener receiving notification from the camera device.</summary>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraEventListener.ImageAdded(Ricoh.CameraController.CameraDevice,Ricoh.CameraController.CameraImage)">
+      <summary>The image has been added. You can transfer image data faster than stored CameraImage.</summary>
+      <param name="sender">Event notification source</param>
+      <param name="image">Added image object</param>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraEventListener.ImageStored(Ricoh.CameraController.CameraDevice,Ricoh.CameraController.CameraImage)">
+      <summary>The image has been stored in storage.</summary>
+      <param name="sender">Event notification source</param>
+      <param name="image">Stored image object</param>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraEventListener.CaptureComplete(Ricoh.CameraController.CameraDevice,Ricoh.CameraController.Capture)">
+      <summary>The capture is complete.</summary>
+      <param name="sender">Event notification source</param>
+      <param name="capture">Image object that has been shot</param>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraEventListener.DeviceDisconnected(Ricoh.CameraController.CameraDevice,Ricoh.CameraController.DeviceInterface)">
+      <summary>The camera device has been disconnected. It will be notified when the cable is pulled out or the main unit is turned off. If you disconnect (CameraDevice.Disconnect) yourself, it will not be notified. </summary>
+      <param name="sender">Event notification source</param>
+      <param name="deviceInterface">Type of device interface</param>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraEventListener.LiveViewFrameUpdated(Ricoh.CameraController.CameraDevice,System.Byte[])">
+      <summary>The live view frame data has been updated.</summary>
+      <param name="sender">Event notification source</param>
+      <param name="liveViewFrame">Binary data of the live view frame</param>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraEventListener.CaptureSettingsChanged(Ricoh.CameraController.CameraDevice,System.Collections.Generic.List{Ricoh.CameraController.CaptureSetting})">
+      <summary>The capture settings has been changed.</summary>
+      <param name="sender">Event notification source</param>
+      <param name="newSettings">The changed settings.</param>
+    </member>
+    <member name="T:Ricoh.CameraController.CameraStatus">
+      <summary>Camera status.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraStatus.BatteryLevel">
+      <summary>Battery level(%). 100(FULL), 67, 33, 0</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraStatus.CurrentCapture">
+      <summary>Current capture status. It is only updated when captured by using capture function of this SDK. (If captured by pushing shutter button, it is not updated.)</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.CameraDeviceSetting">
+      <summary>Basic class of camera device settings. Derived classes of this class are prepared for various camera device settings. An instance of not this class but the derived classes are used.</summary>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDeviceSetting.Equals(System.Object)">
+      <summary>Indicates whether some other setting values is "equal to" this one.</summary>
+      <param name="obj">Object to be compared</param>
+      <returns>Comparison result. True if they match</returns>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraDeviceSetting.Name">
+      <summary>Camera device setting name.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraDeviceSetting.Value">
+      <summary>Camera device setting value.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.CameraDeviceSettingValue">
+      <summary>Basic interface regarding camera device setting values.</summary>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDeviceSettingValue.Equals(System.Object)">
+      <summary>Equivalent evaluation of setting values of camera.</summary>
+      <param name="value">Value to be compared</param>
+      <returns>Comparison result. True if they match</returns>
+    </member>
+    <member name="T:Ricoh.CameraController.CameraTime">
+      <summary>Derived class of CameraDeviceSetting.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.CameraTime.CameraDeviceSettingName">
+      <summary>CameraTime</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.CameraTimeValue">
+      <summary>Derived class of CameraDeviceSettingValue.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.LiveViewImage">
+      <summary>LiveView Image Specification.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.LiveViewImage.Width">
+      <summary>Width</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.LiveViewImage.Height">
+      <summary>Height</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.LiveViewImage.FocusArea">
+      <summary>Focus Area</summary>
+    </member>
+    <member name="M:Ricoh.CameraController.LiveViewImage.ToString">
+      <summary>String of LiveViewImage Specification</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.LiveViewSpecification">
+      <summary>Derived class of CameraDeviceSetting.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.LiveViewSpecification.CaptureSettingName">
+      <summary>LiveViewSpecification</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.LiveViewSpecificationValue">
+      <summary>Derived class of CameraDeviceSettingValue.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.CaptureSetting">
+      <summary>Basic class of capture setting. Derived classes of this class are prepared for various settings. An instance of not this class but the derived classes are used.</summary>
+    </member>
+    <member name="M:Ricoh.CameraController.CaptureSetting.Equals(System.Object)">
+      <summary>Indicates whether some other setting values is "equal to" this one.</summary>
+      <param name="obj">Object to be compared</param>
+      <returns>Comparison result. True if they match</returns>
+    </member>
+    <member name="P:Ricoh.CameraController.CaptureSetting.Name">
+      <summary>Capture setting name.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CaptureSetting.Value">
+      <summary>Capture setting value.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CaptureSetting.AvailableSettings">
+      <summary>Available capture settings value. A list of valid setting values that varies depending on the state and settings of the camera.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.CaptureSettingValue">
+      <summary>Basic interface regarding capture setting values.</summary>
+    </member>
+    <member name="M:Ricoh.CameraController.CaptureSettingValue.Equals(System.Object)">
+      <summary>Equivalent evaluation of setting values of capture.</summary>
+      <param name="value">Value to be compared</param>
+      <returns>Comparison result. True if they match</returns>
+    </member>
+    <member name="T:Ricoh.CameraController.ShutterSpeed">
+      <summary>Derived class of CaptureSetting.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.CaptureSettingName">
+      <summary>ShutterSpeed</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_24000">
+      <summary>1/24000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_20000">
+      <summary>1/20000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_16000">
+      <summary>1/16000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_12800">
+      <summary>1/12800</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_12000">
+      <summary>1/12000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_10000">
+      <summary>1/10000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_8000">
+      <summary>1/8000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_6400">
+      <summary>1/6400</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_6000">
+      <summary>1/6000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_5000">
+      <summary>1/5000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_4000">
+      <summary>1/4000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_3200">
+      <summary>1/3200</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_3000">
+      <summary>1/3000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_2500">
+      <summary>1/2500</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_2000">
+      <summary>1/2000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_1600">
+      <summary>1/1600</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_1500">
+      <summary>1/1500</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_1250">
+      <summary>1/1250</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_1000">
+      <summary>1/1000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_800">
+      <summary>1/800</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_750">
+      <summary>1/750</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_640">
+      <summary>1/640</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_500">
+      <summary>1/500</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_400">
+      <summary>1/400</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_350">
+      <summary>1/350</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_320">
+      <summary>1/320</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_250">
+      <summary>1/250</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_200">
+      <summary>1/200</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_180">
+      <summary>1/180</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_160">
+      <summary>1/160</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_125">
+      <summary>1/125</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_100">
+      <summary>1/100</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_90">
+      <summary>1/90</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_80">
+      <summary>1/80</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_60">
+      <summary>1/60</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_50">
+      <summary>1/50</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_45">
+      <summary>1/45</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_40">
+      <summary>1/40</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_30">
+      <summary>1/30</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_25">
+      <summary>1/25</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_20">
+      <summary>1/20</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_15">
+      <summary>1/15</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_13">
+      <summary>1/13</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_10">
+      <summary>1/10</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_8">
+      <summary>1/8</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_6">
+      <summary>1/6</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_5">
+      <summary>1/5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_4">
+      <summary>1/4</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_3">
+      <summary>1/3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS3_10">
+      <summary>0.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS10_25">
+      <summary>1/2.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS4_10">
+      <summary>0.4</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1_2">
+      <summary>1/2</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS5_10">
+      <summary>0.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS6_10">
+      <summary>0.6</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS10_16">
+      <summary>1/1.6</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS7_10">
+      <summary>0.7</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS10_13">
+      <summary>1/1.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS8_10">
+      <summary>0.8</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1">
+      <summary>1</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS13_10">
+      <summary>1.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS15_10">
+      <summary>1.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS16_10">
+      <summary>1.6</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS2">
+      <summary>2</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS25_10">
+      <summary>2.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS3">
+      <summary>3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS32_10">
+      <summary>3.2</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS4">
+      <summary>4</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS5">
+      <summary>5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS6">
+      <summary>6</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS8">
+      <summary>8</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS10">
+      <summary>10</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS13">
+      <summary>13</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS15">
+      <summary>15</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS20">
+      <summary>20</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS25">
+      <summary>25</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS30">
+      <summary>30</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS40">
+      <summary>40</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS50">
+      <summary>50</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS60">
+      <summary>60(1m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS70">
+      <summary>70(1m10s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS80">
+      <summary>80(1m20s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS90">
+      <summary>90(1m30s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS100">
+      <summary>100(1m40s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS110">
+      <summary>110(1m50s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS120">
+      <summary>120(2m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS130">
+      <summary>130(2m10s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS140">
+      <summary>140(2m20s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS150">
+      <summary>150(2m30s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS160">
+      <summary>160(2m40s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS170">
+      <summary>170(2m50s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS180">
+      <summary>180(3m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS190">
+      <summary>190(3m10s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS200">
+      <summary>200(3m20s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS210">
+      <summary>210(3m30s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS220">
+      <summary>220(3m40s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS230">
+      <summary>230(3m50s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS240">
+      <summary>240(4m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS250">
+      <summary>250(4m10s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS260">
+      <summary>260(4m20s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS270">
+      <summary>270(4m30s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS280">
+      <summary>280(4m40s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS290">
+      <summary>290(4m50s)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS300">
+      <summary>300(5m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS360">
+      <summary>360(6m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS420">
+      <summary>420(7m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS480">
+      <summary>480(8m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS540">
+      <summary>540(9m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS600">
+      <summary>600(10m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS660">
+      <summary>660(11m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS720">
+      <summary>720(12m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS780">
+      <summary>780(13m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS840">
+      <summary>840(14m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS900">
+      <summary>900(15m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS960">
+      <summary>960(16m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1020">
+      <summary>1020(17m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1080">
+      <summary>1080(18m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1140">
+      <summary>1140(19m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.SS1200">
+      <summary>1200(20m)</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.Bulb">
+      <summary>bulb</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ShutterSpeed.Auto">
+      <summary>auto</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.ShutterSpeedValue">
+      <summary>Derived class of CaptureSettingValue.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.WhiteBalance">
+      <summary>Derived class of CaptureSetting.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.CaptureSettingName">
+      <summary>WhiteBalance</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.Undefined">
+      <summary>Undefined</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.Auto">
+      <summary>Auto</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.Daylight">
+      <summary>Daylight</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.Tungsten">
+      <summary>Tungsten Light</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.Incandescent">
+      <summary>Incandescent Light</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.Shade">
+      <summary>Shade</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.Cloudy">
+      <summary>Cloudy</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.FluorescentDaylight">
+      <summary>Fluorescent Light Daylight Color</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.FluorescentDaylightWhite">
+      <summary>Fluorescent Light Daylight White</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.FluorescentCoolWhite">
+      <summary>Fluorescent Light Cool White</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.FluorescentWarmWhite">
+      <summary>Fluorescent Light Warm White</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.Manual">
+      <summary>Manual</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.Manual2">
+      <summary>Manual 2</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.Manual3">
+      <summary>Manual 3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.ColorTemperature">
+      <summary>Color Temperature Configuration</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.ColorTemperature2">
+      <summary>Color Temperature Configuration 2</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.ColorTemperature3">
+      <summary>Color Temperature Configuration 3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.CTE">
+      <summary>CTE</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.MultiAuto">
+      <summary>Multi Auto</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.WhiteBalance.Flash">
+      <summary>Flash</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.WhiteBalanceValue">
+      <summary>Derived class of CaptureSettingValue.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.CaptureMethod">
+      <summary>Derived class of CaptureSetting.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.CaptureMethod.CaptureSettingName">
+      <summary>CaptureMethod</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.CaptureMethod.StillImage">
+      <summary>Still Image</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.CaptureMethod.Movie">
+      <summary>Movie</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.CaptureMethodValue">
+      <summary>Derived class of CaptureSettingValue.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.FNumber">
+      <summary>Derived class of CaptureSetting.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.CaptureSettingName">
+      <summary>FNumber</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.Null">
+      <summary>null</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F0_5">
+      <summary>0.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F0_7">
+      <summary>0.7</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F0_8">
+      <summary>0.8</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F0_9">
+      <summary>0.9</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F1_0">
+      <summary>1.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F1_1">
+      <summary>1.1</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F1_2">
+      <summary>1.2</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F1_3">
+      <summary>1.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F1_4">
+      <summary>1.4</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F1_6">
+      <summary>1.6</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F1_7">
+      <summary>1.7</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F1_8">
+      <summary>1.8</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F1_9">
+      <summary>1.9</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F2_0">
+      <summary>2.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F2_2">
+      <summary>2.2</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F2_4">
+      <summary>2.4</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F2_5">
+      <summary>2.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F2_8">
+      <summary>2.8</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F3_2">
+      <summary>3.2</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F3_3">
+      <summary>3.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F3_5">
+      <summary>3.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F4_0">
+      <summary>4.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F4_5">
+      <summary>4.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F4_8">
+      <summary>4.8</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F5_0">
+      <summary>5.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F5_6">
+      <summary>5.6</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F5_8">
+      <summary>5.8</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F6_3">
+      <summary>6.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F6_7">
+      <summary>6.7</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F7_1">
+      <summary>7.1</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F8_0">
+      <summary>8.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F9_0">
+      <summary>9.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F9_5">
+      <summary>9.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F10">
+      <summary>10</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F11">
+      <summary>11</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F13">
+      <summary>13</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F14">
+      <summary>14</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F16">
+      <summary>16</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F18">
+      <summary>18</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F19">
+      <summary>19</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F20">
+      <summary>20</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F22">
+      <summary>22</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F25">
+      <summary>25</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F27">
+      <summary>27</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F29">
+      <summary>29</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F32">
+      <summary>32</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F36">
+      <summary>36</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F38">
+      <summary>38</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F40">
+      <summary>40</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F45">
+      <summary>45</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F51">
+      <summary>51</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F54">
+      <summary>54</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F57">
+      <summary>57</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F64">
+      <summary>64</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F72">
+      <summary>72</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F76">
+      <summary>76</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F80">
+      <summary>80</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F81">
+      <summary>81</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F90">
+      <summary>90</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F107">
+      <summary>107</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F128">
+      <summary>128</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F180">
+      <summary>180</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.FNumber.F256">
+      <summary>256</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.FNumberValue">
+      <summary>Derived class of CaptureSettingValue.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.ISO">
+      <summary>Derived class of CaptureSetting.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.CaptureSettingName">
+      <summary>ISO</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.Auto">
+      <summary>auto</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO100">
+      <summary>100</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO125">
+      <summary>125</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO140">
+      <summary>140</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO160">
+      <summary>160</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO200">
+      <summary>200</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO250">
+      <summary>250</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO280">
+      <summary>280</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO320">
+      <summary>320</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO400">
+      <summary>400</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO500">
+      <summary>500</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO560">
+      <summary>560</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO640">
+      <summary>640</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO800">
+      <summary>800</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO1000">
+      <summary>1000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO1100">
+      <summary>1100</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO1250">
+      <summary>1250</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO1600">
+      <summary>1600</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO2000">
+      <summary>2000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO2200">
+      <summary>2200</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO2500">
+      <summary>2500</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO3200">
+      <summary>3200</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO4000">
+      <summary>4000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO4500">
+      <summary>4500</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO5000">
+      <summary>5000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO6400">
+      <summary>6400</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO8000">
+      <summary>8000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO9000">
+      <summary>9000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO10000">
+      <summary>10000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO12800">
+      <summary>12800</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO16000">
+      <summary>16000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO18000">
+      <summary>18000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO20000">
+      <summary>20000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO25600">
+      <summary>25600</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO32000">
+      <summary>32000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO36000">
+      <summary>36000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO40000">
+      <summary>40000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO51200">
+      <summary>51200</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO64000">
+      <summary>64000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO72000">
+      <summary>72000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO80000">
+      <summary>80000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO102400">
+      <summary>102400</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO128000">
+      <summary>128000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO144000">
+      <summary>144000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO160000">
+      <summary>160000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO204800">
+      <summary>204800</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO256000">
+      <summary>256000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO288000">
+      <summary>288000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO320000">
+      <summary>320000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO409600">
+      <summary>409600</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO512000">
+      <summary>512000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO576000">
+      <summary>576000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO640000">
+      <summary>640000</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ISO.ISO819200">
+      <summary>819200</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.ISOValue">
+      <summary>Derived class of CaptureSettingValue.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.ExposureCompensation">
+      <summary>Derived class of CaptureSetting.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.CaptureSettingName">
+      <summary>ExposureCompensation</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative5_0">
+      <summary>-5.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative4_7">
+      <summary>-4.7</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative4_5">
+      <summary>-4.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative4_3">
+      <summary>-4.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative4_0">
+      <summary>-4.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative3_7">
+      <summary>-3.7</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative3_5">
+      <summary>-3.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative3_3">
+      <summary>-3.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative3_0">
+      <summary>-3.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative2_7">
+      <summary>-2.7</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative2_5">
+      <summary>-2.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative2_3">
+      <summary>-2.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative2_0">
+      <summary>-2.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative1_7">
+      <summary>-1.7</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative1_5">
+      <summary>-1.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative1_3">
+      <summary>-1.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative1_0">
+      <summary>-1.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative0_7">
+      <summary>-0.7</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative0_5">
+      <summary>-0.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.ECNegative0_3">
+      <summary>-0.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC0_0">
+      <summary>0.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC0_3">
+      <summary>0.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC0_5">
+      <summary>0.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC0_7">
+      <summary>0.7</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC1_0">
+      <summary>1.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC1_3">
+      <summary>1.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC1_5">
+      <summary>1.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC1_7">
+      <summary>1.7</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC2_0">
+      <summary>2.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC2_3">
+      <summary>2.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC2_5">
+      <summary>2.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC2_7">
+      <summary>2.7</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC3_0">
+      <summary>3.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC3_3">
+      <summary>3.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC3_5">
+      <summary>3.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC3_7">
+      <summary>3.7</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC4_0">
+      <summary>4.0</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC4_3">
+      <summary>4.3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC4_5">
+      <summary>4.5</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC4_7">
+      <summary>4.7</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureCompensation.EC5_0">
+      <summary>5.0</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.ExposureCompensationValue">
+      <summary>Derived class of CaptureSettingValue.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.StorageWriting">
+      <summary>Derived class of CaptureSetting.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StorageWriting.CaptureSettingName">
+      <summary>StorageWriting</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StorageWriting.True">
+      <summary>true</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StorageWriting.False">
+      <summary>false</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.StorageWritingValue">
+      <summary>Derived class of CaptureSettingValue.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.StillImageCaptureFormat">
+      <summary>Derived class of CaptureSetting.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageCaptureFormat.CaptureSettingName">
+      <summary>StillImageCaptureFormat</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageCaptureFormat.JPEG">
+      <summary>JPEG</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageCaptureFormat.PEF">
+      <summary>PEF</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageCaptureFormat.DNG">
+      <summary>DNG</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageCaptureFormat.PEFAndJPEG">
+      <summary>PEF and JPEG</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageCaptureFormat.DNGAndJPEG">
+      <summary>DNG and JPEG</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageCaptureFormat.TIFF">
+      <summary>TIFF</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.StillImageCaptureFormatValue">
+      <summary>Derived class of CaptureSettingValue.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.StillImageQuality">
+      <summary>Derived class of CaptureSetting.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageQuality.CaptureSettingName">
+      <summary>StillImageQuality</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageQuality.LargeBest">
+      <summary>Large Image Size, Best Image Quality</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageQuality.LargeBetter">
+      <summary>Large Image Size, Better Image Quality</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageQuality.LargeGood">
+      <summary>Large Image Size, Good Image Quality</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageQuality.MediumBest">
+      <summary>Medium Image Size, Best Image Quality</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageQuality.MediumBetter">
+      <summary>Medium Image Size, Better Image Quality</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageQuality.MediumGood">
+      <summary>Medium Image Size, Good Image Quality</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageQuality.SmallBest">
+      <summary>Small Image Size, Best Image Quality</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageQuality.SmallBetter">
+      <summary>Small Image Size, Better Image Quality</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageQuality.SmallGood">
+      <summary>Small Image Size, Good Image Quality</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageQuality.ExtraSmallBest">
+      <summary>Extra Small Image Size, Best Image Quality</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageQuality.ExtraSmallBetter">
+      <summary>Extra Small Image Size, Better Image Quality</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StillImageQuality.ExtraSmallGood">
+      <summary>Extra Small Image Size, Good Image Quality</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.StillImageQualityValue">
+      <summary>Derived class of CaptureSettingValue.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.ExposureProgram">
+      <summary>Derived class of CaptureSetting.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureProgram.CaptureSettingName">
+      <summary>ExposureProgram</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureProgram.Unknown">
+      <summary>Unknown</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureProgram.Auto">
+      <summary>Auto</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureProgram.Program">
+      <summary>Program</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureProgram.AperturePriority">
+      <summary>AperturePriority</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureProgram.ShutterSpeedPriority">
+      <summary>ShutterSpeedPriority</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureProgram.ShutterSpeedAndAperturePriority">
+      <summary>ShutterSpeedAndAperturePriority</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureProgram.ISOPriority">
+      <summary>ISOPriority</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureProgram.Manual">
+      <summary>Manual</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureProgram.Bulb">
+      <summary>Bulb</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureProgram.FlashXSyncSpeed">
+      <summary>FlashXSyncSpeed</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureProgram.Astrotracer">
+      <summary>Astrotracer</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ExposureProgram.LensShutter">
+      <summary>LensShutter</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.ExposureProgramValue">
+      <summary>Derived class of CaptureSettingValue.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.HyperOperationEnable">
+      <summary>Derived class of CaptureSetting.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.HyperOperationEnable.CaptureSettingName">
+      <summary>HyperOperationEnable</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.HyperOperationEnable.True">
+      <summary>true</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.HyperOperationEnable.False">
+      <summary>false</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.HyperOperationEnableValue">
+      <summary>Derived class of CaptureSettingValue.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.UserCaptureSettingsMode">
+      <summary>Derived class of CaptureSetting.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.UserCaptureSettingsMode.CaptureSettingName">
+      <summary>UserCaptureSettingsMode</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.UserCaptureSettingsMode.Unknown">
+      <summary>Unknown</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.UserCaptureSettingsMode.None">
+      <summary>None</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.UserCaptureSettingsMode.User">
+      <summary>User</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.UserCaptureSettingsMode.User2">
+      <summary>User2</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.UserCaptureSettingsMode.User3">
+      <summary>User3</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.UserCaptureSettingsMode.User4">
+      <summary>User4</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.UserCaptureSettingsMode.User5">
+      <summary>User5</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.UserCaptureSettingsModeValue">
+      <summary>Derived class of CaptureSettingValue.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.CaptureState">
+      <summary>Capture state.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.CaptureState.Unknown">
+      <summary>Unknown state.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.CaptureState.Executing">
+      <summary>Capture in progress. Exposure started.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.CaptureState.Complete">
+      <summary>All processing such as saving due to capture is completed.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.Capture">
+      <summary>Class for handling camera capture information.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.Capture.ID">
+      <summary>Identifier.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.Capture.State">
+      <summary>Capture state.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.Capture.Method">
+      <summary>Capture method.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.Result">
+      <summary>Request result.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.ErrorCode">
+      <summary>Error code.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ErrorCode.NetworkError">
+      <summary>Network error.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ErrorCode.DeviceNotFound">
+      <summary>Device not found.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ErrorCode.ImageNotFound">
+      <summary>There is no specified image.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ErrorCode.InvalidSetting">
+      <summary>Invalid value.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ErrorCode.InvalidArgument">
+      <summary>Invalid parameter.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ErrorCode.NoSpace">
+      <summary>Not enough space.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ErrorCode.Forbidden">
+      <summary>It was rejected by the camera state or request conditions.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ErrorCode.UnknownValue">
+      <summary>Unknown value not supported.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.ErrorCode.AFFailed">
+      <summary>Autofocus error.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.Error">
+      <summary>Error information. The response (Response) result is returned as an error if the method of the interface fails in the body state or for some reason.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.Error.Code">
+      <summary>Error code.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.Error.Message">
+      <summary>Error Details. Text for debugging. In case of USB(MTP) error, it contains MTP response code and its message.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.Response">
+      <summary>Response to request. If returning interface-specific properties, the Response class is extended.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.Response.OK">
+      <summary>OK</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.Response.Result">
+      <summary>Request result.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.Response.Errors">
+      <summary>Error information. Errors.Count becomes 0 if there is no error.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.StartCaptureResponse">
+      <summary>Response to request including the capture information.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.StartCaptureResponse.Capture">
+      <summary>Capture information.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.StorageType">
+      <summary>Storage type.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.StoragePermission">
+      <summary>Storage permission.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.StorageListImagesState">
+      <summary>Acquisition status of image information list in storage.</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StorageListImagesState.NotListed">
+      <summary>Not acquired</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StorageListImagesState.Listing">
+      <summary>Acquiring</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StorageListImagesState.Pending">
+      <summary>Pending</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StorageListImagesState.Listed">
+      <summary>Acquisition complete</summary>
+    </member>
+    <member name="F:Ricoh.CameraController.StorageListImagesState.Interrupted">
+      <summary>Was interrupted</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.CameraStorage">
+      <summary>Information on the storage of the camera device.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraStorage.ID">
+      <summary>Storage identifier.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraStorage.IsAvailable">
+      <summary>Whether it is available.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraStorage.Type">
+      <summary>Storage type.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraStorage.Permission">
+      <summary>Storage permission.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraStorage.MaxCapacity">
+      <summary>Maximum available capacity. (byte)</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraStorage.FreeSpace">
+      <summary>Available free space. (byte)</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraStorage.RemainingPictures">
+      <summary>Number of remaining shootable pictures.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraStorage.ListImagesState">
+      <summary>Acquisition status of image information list in storage.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraStorage.Images">
+      <summary>Image information list. Image list is updated automatically while connected in the background.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.ImageType">
+      <summary>Image type.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.ImageFormat">
+      <summary>Image format.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.CameraImage">
+      <summary>Class for handling with image information and image data.</summary>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraImage.GetData(System.IO.Stream)">
+      <summary>Get the image in the camera device.</summary>
+      <param name="outputStream">Image data stream. If you specify FileStream etc., data will be written.</param>
+      <returns>Response to request</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraImage.GetThumbnail(System.IO.Stream)">
+      <summary>Get the thumbnail image in the camera device.</summary>
+      <param name="outputStream">Image data stream. If you specify FileStream etc., data will be written.</param>
+      <returns>Response to request</returns>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraImage.Delete">
+      <summary>Delete the image in the camera device.</summary>
+      <returns>Response to request</returns>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraImage.ID">
+      <summary>Image identifier.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraImage.Storage">
+      <summary>Storage information.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraImage.Name">
+      <summary>Image name.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraImage.Size">
+      <summary>File size. (byte)</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraImage.Type">
+      <summary>Image type.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraImage.Format">
+      <summary>Image format.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraImage.DateTime">
+      <summary>Date and time of shooting.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraImage.HasThumbnail">
+      <summary>Whether thumbnail can be acquired.</summary>
+    </member>
+    <member name="P:Ricoh.CameraController.CameraImage.Exists">
+      <summary>Whether or not the entity of the image exists.</summary>
+    </member>
+    <member name="T:Ricoh.CameraController.CameraDeviceDetector">
+      <summary>Class for detecting connectable camera devices. Currently, only USB connection (MTP) is supported and can be detected.</summary>
+    </member>
+    <member name="M:Ricoh.CameraController.CameraDeviceDetector.Detect(Ricoh.CameraController.DeviceInterface)">
+      <summary>Detect devices with specified interfaces.</summary>
+      <param name="deviceInterface">Type of device interface</param>
+      <returns>Detected device list</returns>
+    </member>
+  </members>
+</doc>

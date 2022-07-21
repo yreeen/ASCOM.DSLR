@@ -74,6 +74,9 @@
     <Reference Include="ASCOM.SettingsProvider, Version=6.0.0.0, Culture=neutral, PublicKeyToken=565de7938946fba7, processorArchitecture=MSIL" />
     <Reference Include="ASCOM.Utilities, Version=6.0.0.0, Culture=neutral, PublicKeyToken=565de7938946fba7, processorArchitecture=MSIL" />
     <Reference Include="ASCOM.Utilities.Video, Version=6.1.0.0, Culture=neutral, PublicKeyToken=565de7938946fba7, processorArchitecture=MSIL" />
+    <Reference Include="RicohCameraSDK">
+      <HintPath>..\..\ASCOM.DSLR\ASCOM.DSLR\SDK\X64\RicohCameraSDK.dll</HintPath>
+    </Reference>
     <Reference Include="Rssdp, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Rssdp.4.0.0\lib\net45\Rssdp.dll</HintPath>
     </Reference>
@@ -108,6 +111,7 @@
     <Compile Include="Classes\ExifToolWrapper.cs" />
     <Compile Include="Classes\NikonSDKCamera.cs" />
     <Compile Include="Classes\PentaxCamera.cs" />
+    <Compile Include="Classes\PentaxSDKCamera.cs" />
     <Compile Include="Classes\SerialPortShutterRelease.cs" />
     <Compile Include="Driver.cs" />
     <Compile Include="Enums\BinningMode.cs" />
