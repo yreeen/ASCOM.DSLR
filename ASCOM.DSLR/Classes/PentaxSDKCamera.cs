@@ -247,6 +247,26 @@ namespace ASCOM.DSLR.Classes
         public event EventHandler<ExposureFailedEventArgs> ExposureFailed;
         public event EventHandler<LiveViewImageReadyEventArgs> LiveViewImageReady;
 
+        //public class EventListner : RCC.CameraEventListener
+        //{
+        //    public override void ImageAdded(RCC.CameraDevice sender, RCC.CameraImage image)
+        //    {
+        //        if(image.Type != RCC.ImageType.StillImage)
+        //        {
+        //            Logger.WriteTraceMessage("not StillImage was captured. (" + image.Type.ToString() + ")");
+        //            base.ImageAdded(sender, image);
+        //            return;
+        //        }
+        //        if(image.Format != RCC.ImageFormat.DNG)
+        //        {
+        //            Logger.WriteTraceMessage("not DNG image was captured. (" + image.Format.ToString() + ")");
+        //            base.ImageAdded(sender, image);
+        //            return;
+        //        }
+                
+        //    }
+        //}
+
         private RCC.DeviceInterface _deviceInterface = RCC.DeviceInterface.USB;
 
         private RCC.CameraDevice _connectedCameraDevice = null;
@@ -289,7 +309,8 @@ namespace ASCOM.DSLR.Classes
 
         public void AbortExposure()
         {
-
+            RCC.Response response = _connectedCameraDevice?.StopCapture();
+            Logger.WriteTraceMessage("AbortExposure(); called. response is " + response.Result.ToString());
         }
 
         public void ConnectCamera()
@@ -297,12 +318,19 @@ namespace ASCOM.DSLR.Classes
             if (_connectedCameraDevice != null)
                 DisconnectCamera();
             _connectedCameraDevice = null;
+            if(DetectedCameraDevices.Count() == 0)
+            {
+                Logger.WriteTraceMessage("ConnectCamera(); Failed.");
+                throw new NotConnectedException("ConnectCamera Faild.");
+
+            }
             _connectedCameraDevice = DetectedCameraDevices.First();
             RCC.Response response = _connectedCameraDevice.Connect(_deviceInterface);
 
             if (!_connectedCameraDevice.IsConnected(_deviceInterface))
             {
                 _connectedCameraDevice = null;
+                Logger.WriteTraceMessage("ConnectCamera(); Failed.");
                 throw new NotConnectedException("ConnectCamera Faild.");
             }
 
@@ -326,11 +354,12 @@ namespace ASCOM.DSLR.Classes
         {
             RCC.Response resoponse = _connectedCameraDevice.Disconnect(_deviceInterface);
             _connectedCameraDevice = null;
+            
         }
 
         public void Dispose()
         {
-
+            DisconnectCamera();
         }
 
         public override CameraModel ScanCameras()
@@ -387,14 +416,22 @@ namespace ASCOM.DSLR.Classes
             string fileName = StorePath + "\\" + GetFileName(Duration, DateTime.Now);
             MarkWaitingForExposure(Duration, fileName);
             watch();
-            //データ受信用のイベントリスナーを設定する
-
 
             //Iso,Durationを設定する
             var iso = int2iso(Iso);
             var shutterspeed = double2ss(Duration);
             _connectedCameraDevice.SetCaptureSettings(new List<RCC.CaptureSetting>() {iso,shutterspeed });
-            RCC.StartCaptureResponse startCaptureResponse = _connectedCameraDevice.StartCapture();
+            RCC.StartCaptureResponse startCaptureResponse = _connectedCameraDevice.StartCapture(false);
+            if(startCaptureResponse.Result == RCC.Result.OK)
+            {
+                while(startCaptureResponse.Capture.State != RCC.CaptureState.Executing)Task.Delay(10);
+                using(FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                {
+                    RCC.Response imageGetResponse = _connectedCameraDevice.Images[0].GetData(fs);
+                    Logger.WriteTraceMessage("StartExposure(); called. image.GetData() is " + (imageGetResponse.Result == RCC.Result.OK ? "SUCCEED." : "FAILED."));
+                }
+                return;
+            }
 
             ////ExecuteCommand(string.Format("--file_format dng -o {0} --iso {1} --shutter_speed {2}", fileName + ".dng", Iso, Duration));
             ////pktriggercord-cli --file_format dng -o c:\temp\test.dng -i 400 -t 1
