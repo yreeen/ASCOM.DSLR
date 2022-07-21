@@ -17,7 +17,7 @@ namespace ASCOM.DSLR.Classes
     public class PentaxSDKCamera : BaseCamera, IDslrCamera
     {
         readonly Dictionary<int, RCC.ISO> _IsoMap = new Dictionary<int, RCC.ISO>()
-        {//shortだと高感度がカバーできないのでint型
+        {//for support high ISO, it use int type.
             {100, RCC.ISO.ISO100},
             {125, RCC.ISO.ISO125},
             {140, RCC.ISO.ISO140},
@@ -215,7 +215,7 @@ namespace ASCOM.DSLR.Classes
                 return _ShutterSpeedMap[dss];
 
             //TODO
-            //double値で直接ヒットしなかった場合、最も近いキーを探す
+            //double値で直接ヒットしなかった場合、最も近いキーを探すコードをそのうち書く
             //ただし、もっとも近いキーとの差が３％を超えるのであれば例外を投げること
             
             throw new InvalidValueException("SS " + dss + " is not supported. ss2double();");
@@ -278,7 +278,6 @@ namespace ASCOM.DSLR.Classes
             {
                 if (_detectedCameraDevices == null)
                 {
-//                    RCC.DeviceInterface deviceInterface = RCC.DeviceInterface.USB;
                     _detectedCameraDevices = new List<RCC.CameraDevice>(RCC.CameraDeviceDetector.Detect(_deviceInterface));
                 }
                 return _detectedCameraDevices;
@@ -348,10 +347,13 @@ namespace ASCOM.DSLR.Classes
                 SimpleISOList.Add((short)value);
 
             }
+
+            //使用可能なシャッタースピードのリストを取得するコードをそのうち書く
         }
 
         public void DisconnectCamera()
         {
+            if (_connectedCameraDevice == null) return;
             RCC.Response resoponse = _connectedCameraDevice.Disconnect(_deviceInterface);
             _connectedCameraDevice = null;
             
@@ -413,7 +415,7 @@ namespace ASCOM.DSLR.Classes
 
             Logger.WriteTraceMessage("PentaxSDKCamera.StartExposure(Duration, Light), duration ='" + Duration.ToString() + "', Light = '" + Light.ToString() + "'");
 
-            string fileName = StorePath + "\\" + GetFileName(Duration, DateTime.Now);
+            string fileName = StorePath + GetFileName(Duration, DateTime.Now) + ".dng";
             MarkWaitingForExposure(Duration, fileName);
             watch();
 
@@ -424,10 +426,29 @@ namespace ASCOM.DSLR.Classes
             RCC.StartCaptureResponse startCaptureResponse = _connectedCameraDevice.StartCapture(false);
             if(startCaptureResponse.Result == RCC.Result.OK)
             {
-                while(startCaptureResponse.Capture.State != RCC.CaptureState.Executing)Task.Delay(10);
+                //while(startCaptureResponse.Capture.State == RCC.CaptureState.Executing)Task.Delay(10);
                 using(FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
                 {
-                    RCC.Response imageGetResponse = _connectedCameraDevice.Images[0].GetData(fs);
+                    while(_connectedCameraDevice.Images.Count() == 0);
+                    int i = 0;
+                    bool flag = false;
+                    for(;i < _connectedCameraDevice.Images.Count();++i)
+                    {
+                        if (_connectedCameraDevice.Images[i].Format == RCC.ImageFormat.DNG)
+                        {
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if(!flag)
+                    {
+                        Logger.WriteTraceMessage("StartExposure(); Failed. check camera setting. Is Law mode DNG?");
+
+                        throw new ASCOM.InvalidOperationException("StartExposure(); Failed. check camera setting. Is Law mode DNG?");
+                    }
+                    RCC.CameraImage image = _connectedCameraDevice.Images[i];
+                    RCC.Response imageGetResponse = image.GetData(fs);
+                    fs.Close();
                     Logger.WriteTraceMessage("StartExposure(); called. image.GetData() is " + (imageGetResponse.Result == RCC.Result.OK ? "SUCCEED." : "FAILED."));
                 }
                 return;
@@ -477,7 +498,7 @@ namespace ASCOM.DSLR.Classes
 
             Logger.WriteTraceMessage("onchanged " + fileName);
 
-            var destinationFilePath = Path.ChangeExtension(Path.Combine(StorePath, Path.Combine(StorePath, _fileNameWaiting)), ".dng");
+            var destinationFilePath = Path.ChangeExtension(Path.Combine(StorePath, Path.Combine(StorePath, _fileNameWaiting)), "-.dng");
 
             Logger.WriteTraceMessage("onchanged dest " + destinationFilePath);
 
