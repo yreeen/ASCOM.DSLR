@@ -192,6 +192,7 @@ namespace ASCOM.DSLR.Classes
             {1/24000.0,RCC.ShutterSpeed.SS1_24000 },
         };
 
+        //TODO カメラが対応していないシャッタースピードやISOではエラーを返すようにする
         private RCC.ISO int2iso(int iso)
         {
             if (_IsoMap.ContainsKey(iso))
@@ -218,7 +219,7 @@ namespace ASCOM.DSLR.Classes
 
             foreach (KeyValuePair<double,RCC.ShutterSpeed> kvp in _ShutterSpeedMap)
             {
-                if (Math.Abs(dss - kvp.Key) < Math.Abs(result.Key - kvp.Key))
+                if (Math.Abs(kvp.Key - dss) <= Math.Abs(result.Key - dss))
                     result = kvp;
             }
 
@@ -233,9 +234,6 @@ namespace ASCOM.DSLR.Classes
 
             return result.Value;
 
-            //TODO
-            //double値で直接ヒットしなかった場合、最も近いキーを探すコードをそのうち書く
-            //ただし、もっとも近いキーとの差が50％を超えるのであれば例外を投げること
             
             throw new InvalidValueException("SS " + dss + " is not supported. ss2double();");
         }
@@ -262,9 +260,9 @@ namespace ASCOM.DSLR.Classes
             ConnectCamera();
         }
 
-        public event EventHandler<ImageReadyEventArgs> ImageReady;
-        public event EventHandler<ExposureFailedEventArgs> ExposureFailed;
-        public event EventHandler<LiveViewImageReadyEventArgs> LiveViewImageReady;
+        public event EventHandler<ImageReadyEventArgs> ImageReady;//DNGデータが得られたら呼ぶ
+        public event EventHandler<ExposureFailedEventArgs> ExposureFailed;//撮像失敗したら呼ぶ
+        public event EventHandler<LiveViewImageReadyEventArgs> LiveViewImageReady;//ニコンのコードを参考にすれば実装できる気がする
 
         private RCC.DeviceInterface _deviceInterface = RCC.DeviceInterface.USB;
 
@@ -332,6 +330,7 @@ namespace ASCOM.DSLR.Classes
                 throw new NotConnectedException("ConnectCamera Faild.");
             }
             _connectedCameraDevice = cameraDevice;
+            _connectedCameraDevice.EventListeners.Add(new EventListner(this));
 
             //SimpleISOListに使用可能なISO値を追加する。ただし、short型での実装なのでISO32000までしか登録してはいけない。
             var iso = new RCC.ISO();
@@ -348,7 +347,7 @@ namespace ASCOM.DSLR.Classes
 
             }
 
-            //使用可能なシャッタースピードのリストを取得するコードをそのうち書く
+            //使用可能なシャッタースピードのリストを取得するコードをそのうち書く いらないかも？
         }
 
         public void DisconnectCamera()
@@ -393,6 +392,42 @@ namespace ASCOM.DSLR.Classes
             return cameraModel;
         }
 
+        class EventListner : RCC.CameraEventListener
+        {
+            private PentaxSDKCamera pentaxSDKCamera { get; set; }
+            public EventListner(PentaxSDKCamera pentaxSDKCamera)
+            {
+                this.pentaxSDKCamera = pentaxSDKCamera;
+            }
+            public override void ImageAdded(RCC.CameraDevice sender, RCC.CameraImage image)
+            {
+                if (image.Type != RCC.ImageType.StillImage || image.Format != RCC.ImageFormat.DNG)
+                    return;
+                //                string fileName = Environment.CurrentDirectory + Path.DirectorySeparatorChar + image.Name;
+                string fileName = pentaxSDKCamera.StorePath + image.Name;
+
+                using (FileStream fs = new FileStream(fileName,FileMode.Create, FileAccess.Write))
+                {
+                    var imageGetResponse = image.GetData(fs);
+                    if (imageGetResponse.Result == RCC.Result.OK)
+                    {
+                     //   Console.WriteLine("Image Path: {0}", Environment.CurrentDirectory + Path.DirectorySeparatorChar + image.Name);
+                    }
+                    else
+                    {
+                        foreach (var error in imageGetResponse.Errors)
+                        {
+                       //     Console.WriteLine("Error Code: " + error.Code.ToString() + " / Error Message: " + error.Message);
+                        }
+                        fs.Close();
+                        throw new Exception("image data cannot write into file.");
+                    }
+                }
+                if(pentaxSDKCamera.ImageReady != null)
+                    pentaxSDKCamera.ImageReady(pentaxSDKCamera,new ImageReadyEventArgs(fileName));
+            }
+        }
+
         public void StartExposure(double Duration, bool Light)
         {
             Logger.WriteTraceMessage("PentaxSDKCamera.StartExposure(Duration, Light), duration ='" + Duration.ToString() + "', Light = '" + Light.ToString() + "'");
@@ -406,40 +441,41 @@ namespace ASCOM.DSLR.Classes
             var shutterspeed = double2ss(Duration);
             _connectedCameraDevice.SetCaptureSettings(new List<RCC.CaptureSetting>() {iso,shutterspeed });
             RCC.StartCaptureResponse startCaptureResponse = _connectedCameraDevice.StartCapture(false);
-            if(startCaptureResponse.Result == RCC.Result.OK)
+            if(startCaptureResponse.Result == RCC.Result.Error)
             {
-                //while(startCaptureResponse.Capture.State == RCC.CaptureState.Executing)Task.Delay(10);
-                using(FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
-                {
-                    while(_connectedCameraDevice.Images.Count() == 0);
-                    int i = 0;
-                    bool flag = false;
-                    for(;i < _connectedCameraDevice.Images.Count();++i)
-                    {
-                        if (_connectedCameraDevice.Images[i].Format == RCC.ImageFormat.DNG)
-                        {
-                            flag = true;
-                            break;
-                        }
-                    }
-                    if(!flag)
-                    {
-                        fs.Close();
-                        Logger.WriteTraceMessage("StartExposure(); Failed. check camera setting. Is Law mode DNG?");
-                        throw new ASCOM.InvalidOperationException("StartExposure(); Failed. check camera setting. Is Law mode DNG?");
-                    }
-                    RCC.CameraImage image = _connectedCameraDevice.Images[i];
-                    RCC.Response imageGetResponse = image.GetData(fs);
-                    fs.Close();
-                    Logger.WriteTraceMessage("StartExposure(); called. image.GetData() is " + (imageGetResponse.Result == RCC.Result.OK ? "SUCCEED." : "FAILED."));
-                }
-                if (ImageReady != null)
-                {
-                    ImageReady(this, new ImageReadyEventArgs(fileName));
-                }
+                if (ExposureFailed != null) ExposureFailed(this, new ExposureFailedEventArgs(""));
+            }
+            //while(startCaptureResponse.Capture.State == RCC.CaptureState.Executing)Task.Delay(10);
+            //using(FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+            //{
+            //        while(_connectedCameraDevice.Images.Count() == 0);
+            //        int i = 0;
+            //        bool flag = false;
+            //        for(;i < _connectedCameraDevice.Images.Count();++i)
+            //        {
+            //            if (_connectedCameraDevice.Images[i].Format == RCC.ImageFormat.DNG)
+            //            {
+            //                flag = true;
+            //                break;
+            //            }
+            //        }
+            //        if(!flag)
+            //        {
+            //            fs.Close();
+            //            Logger.WriteTraceMessage("StartExposure(); Failed. check camera setting. Is Law mode DNG?");
+            //            throw new ASCOM.InvalidOperationException("StartExposure(); Failed. check camera setting. Is Law mode DNG?");
+            //        }
+            //        RCC.CameraImage image = _connectedCameraDevice.Images[i];
+            //        RCC.Response imageGetResponse = image.GetData(fs);
+            //        fs.Close();
+            //        Logger.WriteTraceMessage("StartExposure(); called. image.GetData() is " + (imageGetResponse.Result == RCC.Result.OK ? "SUCCEED." : "FAILED."));
+            //    }
+            //    if (ImageReady != null)
+            //    {
+            //        ImageReady(this, new ImageReadyEventArgs(fileName));
+            //    }
 
                 return;
-            }
 
         }
 
