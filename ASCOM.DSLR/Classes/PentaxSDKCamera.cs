@@ -248,11 +248,11 @@ namespace ASCOM.DSLR.Classes
             throw new InvalidValueException("SS " + ss.ToString() + " is not supported. ss2double();");
         }
 
-        private bool _waitingForImage = false;
-        private DateTime _exposureStartTime;
-        private const int timeout = 60;
-        private double _lastDuration;
-        private string _lastFileName;
+        //private bool _waitingForImage = false;
+        //private DateTime _exposureStartTime;
+        //private const int timeout = 60;
+        //private double _lastDuration;
+        //private string _lastFileName;
 
         public PentaxSDKCamera(List<CameraModel> cameraModelsHistory) : base(cameraModelsHistory)
         {
@@ -334,7 +334,8 @@ namespace ASCOM.DSLR.Classes
 
             //SimpleISOListに使用可能なISO値を追加する。ただし、short型での実装なのでISO32000までしか登録してはいけない。
             var iso = new RCC.ISO();
-            _connectedCameraDevice.GetCaptureSettings(new List<RCC.CaptureSetting>() { iso });
+            var ss = new RCC.ShutterSpeed();
+            _connectedCameraDevice.GetCaptureSettings(new List<RCC.CaptureSetting>() { iso ,ss});
             SimpleISOList = null;
             SimpleISOList = new List<short>();
             foreach(var i in iso.AvailableSettings)
@@ -348,6 +349,9 @@ namespace ASCOM.DSLR.Classes
             }
 
             //使用可能なシャッタースピードのリストを取得するコードをそのうち書く いらないかも？
+//            TvList = null;
+//            TvList = new List<>
+
         }
 
         public void DisconnectCamera()
@@ -401,30 +405,45 @@ namespace ASCOM.DSLR.Classes
             }
             public override void ImageAdded(RCC.CameraDevice sender, RCC.CameraImage image)
             {
-                if (image.Type != RCC.ImageType.StillImage || image.Format != RCC.ImageFormat.DNG)
-                    return;
-                //                string fileName = Environment.CurrentDirectory + Path.DirectorySeparatorChar + image.Name;
-                string fileName = pentaxSDKCamera.StorePath + image.Name;
+                if (image.Type != RCC.ImageType.StillImage) return;
+                if (image.Format != RCC.ImageFormat.DNG && image.Format != RCC.ImageFormat.JPEG) return;
+                if (image.Format == RCC.ImageFormat.DNG && pentaxSDKCamera.ImageFormat != ImageFormat.RAW) return;
+                if (image.Format == RCC.ImageFormat.JPEG && pentaxSDKCamera.ImageFormat != ImageFormat.JPEG) return;
 
-                using (FileStream fs = new FileStream(fileName,FileMode.Create, FileAccess.Write))
+                if (pentaxSDKCamera.ImageFormat == ImageFormat.RAW)
                 {
-                    var imageGetResponse = image.GetData(fs);
-                    if (imageGetResponse.Result == RCC.Result.OK)
+
+                    string fileName = pentaxSDKCamera.StorePath + image.Name;
+
+                    using (FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
                     {
-                     //   Console.WriteLine("Image Path: {0}", Environment.CurrentDirectory + Path.DirectorySeparatorChar + image.Name);
-                    }
-                    else
-                    {
-                        foreach (var error in imageGetResponse.Errors)
+                        var imageGetResponse = image.GetData(fs);
+                        if (imageGetResponse.Result == RCC.Result.OK)
                         {
-                       //     Console.WriteLine("Error Code: " + error.Code.ToString() + " / Error Message: " + error.Message);
+                            //   Console.WriteLine("Image Path: {0}", Environment.CurrentDirectory + Path.DirectorySeparatorChar + image.Name);
                         }
-                        fs.Close();
-                        throw new Exception("image data cannot write into file.");
+                        else
+                        {
+                            foreach (var error in imageGetResponse.Errors)
+                            {
+                                //     Console.WriteLine("Error Code: " + error.Code.ToString() + " / Error Message: " + error.Message);
+                            }
+                            fs.Close();
+                            throw new Exception("image data cannot write into file.");
+                        }
                     }
+                    pentaxSDKCamera.ImageReady?.Invoke(pentaxSDKCamera, new ImageReadyEventArgs(fileName));
                 }
-                if(pentaxSDKCamera.ImageReady != null)
-                    pentaxSDKCamera.ImageReady(pentaxSDKCamera,new ImageReadyEventArgs(fileName));
+                //else if (pentaxSDKCamera.ImageFormat == ImageFormat.JPEG)
+                //{
+
+                //    using (MemoryStream ms = new MemoryStream())
+                //    {
+                //        var imageGetResponse = image.GetData(ms);
+
+                //        pentaxSDKCamera.LiveViewImageReady?.Invoke(pentaxSDKCamera,new LiveViewImageReadyEventArgs(new System.Drawing.Bitmap(ms)));
+                //    }
+                //}
             }
         }
 
@@ -433,7 +452,7 @@ namespace ASCOM.DSLR.Classes
             Logger.WriteTraceMessage("PentaxSDKCamera.StartExposure(Duration, Light), duration ='" + Duration.ToString() + "', Light = '" + Light.ToString() + "'");
 
             string fileName = StorePath + GetFileName(Duration, DateTime.Now) + ".dng";
-            MarkWaitingForExposure(Duration, fileName);
+ //           MarkWaitingForExposure(Duration, fileName);
  //           watch();
 
             //Iso,Durationを設定する
@@ -479,63 +498,63 @@ namespace ASCOM.DSLR.Classes
 
         }
 
-        private string _fileNameWaiting;
+        //private string _fileNameWaiting;
 
 
-        private void MarkWaitingForExposure(double Duration, string fileName)
-        {
-            _exposureStartTime = DateTime.Now;
-            _lastDuration = Duration;
-            _waitingForImage = true;
-            _fileNameWaiting = fileName;
-        }
+        //private void MarkWaitingForExposure(double Duration, string fileName)
+        //{
+        //    _exposureStartTime = DateTime.Now;
+        //    _lastDuration = Duration;
+        //    _waitingForImage = true;
+        //    _fileNameWaiting = fileName;
+        //}
 
         FileSystemWatcher watcher;
 
-        private void watch()
-        {
-            if (!Directory.Exists(StorePath))
-            {
-                Directory.CreateDirectory(StorePath);
-            }
+        //private void watch()
+        //{
+        //    if (!Directory.Exists(StorePath))
+        //    {
+        //        Directory.CreateDirectory(StorePath);
+        //    }
 
-            watcher = new FileSystemWatcher();
-            watcher.Path = StorePath;
-            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
-                                   | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-            watcher.Filter = "*.dng";
-            watcher.Changed += new FileSystemEventHandler(OnChanged);
-            watcher.EnableRaisingEvents = true;
+        //    watcher = new FileSystemWatcher();
+        //    watcher.Path = StorePath;
+        //    watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
+        //                           | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+        //    watcher.Filter = "*.dng";
+        //    watcher.Changed += new FileSystemEventHandler(OnChanged);
+        //    watcher.EnableRaisingEvents = true;
 
-            Logger.WriteTraceMessage("watch " + StorePath);
-        }
+        //    Logger.WriteTraceMessage("watch " + StorePath);
+        //}
 
-        private void OnChanged(object source, FileSystemEventArgs e)
-        {
-            var fileName = e.FullPath;
+        //private void OnChanged(object source, FileSystemEventArgs e)
+        //{
+        //    var fileName = e.FullPath;
 
-            Logger.WriteTraceMessage("onchanged " + fileName);
+        //    Logger.WriteTraceMessage("onchanged " + fileName);
 
-            var destinationFilePath = Path.ChangeExtension(Path.Combine(StorePath, Path.Combine(StorePath, _fileNameWaiting)), "-.dng");
+        //    var destinationFilePath = Path.ChangeExtension(Path.Combine(StorePath, Path.Combine(StorePath, _fileNameWaiting)), "-.dng");
 
-            Logger.WriteTraceMessage("onchanged dest " + destinationFilePath);
+        //    Logger.WriteTraceMessage("onchanged dest " + destinationFilePath);
 
-            File.Copy(fileName, destinationFilePath);
-            File.Delete(fileName);
-            if (ImageReady != null)
-            {
-                ImageReady(this, new ImageReadyEventArgs(destinationFilePath));
-            }
-            watcher.Changed -= OnChanged;
-            watcher.EnableRaisingEvents = false;
-            watcher = null;
+        //    File.Copy(fileName, destinationFilePath);
+        //    File.Delete(fileName);
+        //    if (ImageReady != null)
+        //    {
+        //        ImageReady(this, new ImageReadyEventArgs(destinationFilePath));
+        //    }
+        //    watcher.Changed -= OnChanged;
+        //    watcher.EnableRaisingEvents = false;
+        //    watcher = null;
 
-            if ((File.Exists(destinationFilePath)) && (SaveFile == false))
-            {
-                File.Delete(destinationFilePath);
-            }
+        //    if ((File.Exists(destinationFilePath)) && (SaveFile == false))
+        //    {
+        //        File.Delete(destinationFilePath);
+        //    }
 
-        }
+        //}
 
 
 
