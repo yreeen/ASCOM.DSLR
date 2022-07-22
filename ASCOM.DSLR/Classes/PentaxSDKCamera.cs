@@ -214,9 +214,28 @@ namespace ASCOM.DSLR.Classes
             if (_ShutterSpeedMap.ContainsKey(dss))
                 return _ShutterSpeedMap[dss];
 
+            var result = new KeyValuePair<double, RCC.ShutterSpeed>(1000000,RCC.ShutterSpeed.Auto);
+
+            foreach (KeyValuePair<double,RCC.ShutterSpeed> kvp in _ShutterSpeedMap)
+            {
+                if (Math.Abs(dss - kvp.Key) < Math.Abs(result.Key - kvp.Key))
+                    result = kvp;
+            }
+
+            if (result.Value == RCC.ShutterSpeed.Auto)
+            {
+                throw new InvalidValueException("Shutter Speed " + dss + "is not supported. double2ss(); 01");
+            }
+            if(Math.Abs(dss - result.Key) > Math.Abs(dss) * 0.8)
+            {
+                throw new InvalidValueException("Shutter Speed " + dss + "is not supported. double2ss(); 02");
+            }
+
+            return result.Value;
+
             //TODO
             //double値で直接ヒットしなかった場合、最も近いキーを探すコードをそのうち書く
-            //ただし、もっとも近いキーとの差が３％を超えるのであれば例外を投げること
+            //ただし、もっとも近いキーとの差が50％を超えるのであれば例外を投げること
             
             throw new InvalidValueException("SS " + dss + " is not supported. ss2double();");
         }
@@ -246,26 +265,6 @@ namespace ASCOM.DSLR.Classes
         public event EventHandler<ImageReadyEventArgs> ImageReady;
         public event EventHandler<ExposureFailedEventArgs> ExposureFailed;
         public event EventHandler<LiveViewImageReadyEventArgs> LiveViewImageReady;
-
-        //public class EventListner : RCC.CameraEventListener
-        //{
-        //    public override void ImageAdded(RCC.CameraDevice sender, RCC.CameraImage image)
-        //    {
-        //        if(image.Type != RCC.ImageType.StillImage)
-        //        {
-        //            Logger.WriteTraceMessage("not StillImage was captured. (" + image.Type.ToString() + ")");
-        //            base.ImageAdded(sender, image);
-        //            return;
-        //        }
-        //        if(image.Format != RCC.ImageFormat.DNG)
-        //        {
-        //            Logger.WriteTraceMessage("not DNG image was captured. (" + image.Format.ToString() + ")");
-        //            base.ImageAdded(sender, image);
-        //            return;
-        //        }
-                
-        //    }
-        //}
 
         private RCC.DeviceInterface _deviceInterface = RCC.DeviceInterface.USB;
 
@@ -308,34 +307,35 @@ namespace ASCOM.DSLR.Classes
 
         public void AbortExposure()
         {
-            RCC.Response response = _connectedCameraDevice?.StopCapture();
+            if (_connectedCameraDevice == null) return;
+            RCC.Response response = _connectedCameraDevice.StopCapture();
             Logger.WriteTraceMessage("AbortExposure(); called. response is " + response.Result.ToString());
         }
 
         public void ConnectCamera()
         {
-            if (_connectedCameraDevice != null)
-                DisconnectCamera();
-            _connectedCameraDevice = null;
+            if (_connectedCameraDevice != null) return;
             if(DetectedCameraDevices.Count() == 0)
             {
-                Logger.WriteTraceMessage("ConnectCamera(); Failed.");
-                throw new NotConnectedException("ConnectCamera Faild.");
+                Logger.WriteTraceMessage("ConnectCamera(); Failed. no camera device detected.");
+                throw new NotConnectedException("ConnectCamera Faild. no camera device detected.");
 
             }
-            _connectedCameraDevice = DetectedCameraDevices.First();
-            RCC.Response response = _connectedCameraDevice.Connect(_deviceInterface);
+            
+            var cameraDevice = DetectedCameraDevices.First();
+            RCC.Response response = cameraDevice.Connect(_deviceInterface);
 
-            if (!_connectedCameraDevice.IsConnected(_deviceInterface))
+            if (!cameraDevice.IsConnected(_deviceInterface))
             {
                 _connectedCameraDevice = null;
                 Logger.WriteTraceMessage("ConnectCamera(); Failed.");
                 throw new NotConnectedException("ConnectCamera Faild.");
             }
+            _connectedCameraDevice = cameraDevice;
 
+            //SimpleISOListに使用可能なISO値を追加する。ただし、short型での実装なのでISO32000までしか登録してはいけない。
             var iso = new RCC.ISO();
             _connectedCameraDevice.GetCaptureSettings(new List<RCC.CaptureSetting>() { iso });
-            //SimpleISOListに使用可能なISO値を追加する。ただし、short型での実装なのでISO32000までしか登録してはいけない。
             SimpleISOList = null;
             SimpleISOList = new List<short>();
             foreach(var i in iso.AvailableSettings)
@@ -355,12 +355,12 @@ namespace ASCOM.DSLR.Classes
         {
             if (_connectedCameraDevice == null) return;
             RCC.Response resoponse = _connectedCameraDevice.Disconnect(_deviceInterface);
-            _connectedCameraDevice = null;
-            
+            _connectedCameraDevice = null;            
         }
 
         public void Dispose()
         {
+            StopExposure();
             DisconnectCamera();
         }
 
@@ -369,26 +369,10 @@ namespace ASCOM.DSLR.Classes
             CameraModel cameraModel = null;
             cameraModel = GetCameraModel(Model);
 
-//            if (!string.IsNullOrEmpty(_modelStr))
-//            {
-//                cameraModel = GetCameraModel(Model);
-//            }
             if (cameraModel == null)
             {
                 throw new NotConnectedException(ErrorMessages.NotConnected);
             }
-
-            //            RCC.DeviceInterface deviceInterface = RCC.DeviceInterface.USB;
-            //          List<RCC.CameraDevice> detectedCameraDevices =
-            //            RCC.CameraDeviceDetector.Detect(deviceInterface);
-            //            CameraModel cameraModel = new CameraModel
-            //            {
-            //                Name = detectedCameraDevices[0].Model,
-            //                SensorWidth = 23.5,
-            //                SensorHeight = 15.6,
-            //                ImageHeight = 0,
-            //                ImageWidth = 0,
-            //            };
 
             if (cameraModel.Name == "PENTAX K-1" || cameraModel.Name == "PENTAX K-1 Mark II")
             {//Pentax k-1 (mk2)
@@ -411,13 +395,11 @@ namespace ASCOM.DSLR.Classes
 
         public void StartExposure(double Duration, bool Light)
         {
-            
-
             Logger.WriteTraceMessage("PentaxSDKCamera.StartExposure(Duration, Light), duration ='" + Duration.ToString() + "', Light = '" + Light.ToString() + "'");
 
             string fileName = StorePath + GetFileName(Duration, DateTime.Now) + ".dng";
             MarkWaitingForExposure(Duration, fileName);
-            watch();
+ //           watch();
 
             //Iso,Durationを設定する
             var iso = int2iso(Iso);
@@ -442,8 +424,8 @@ namespace ASCOM.DSLR.Classes
                     }
                     if(!flag)
                     {
+                        fs.Close();
                         Logger.WriteTraceMessage("StartExposure(); Failed. check camera setting. Is Law mode DNG?");
-
                         throw new ASCOM.InvalidOperationException("StartExposure(); Failed. check camera setting. Is Law mode DNG?");
                     }
                     RCC.CameraImage image = _connectedCameraDevice.Images[i];
@@ -451,13 +433,13 @@ namespace ASCOM.DSLR.Classes
                     fs.Close();
                     Logger.WriteTraceMessage("StartExposure(); called. image.GetData() is " + (imageGetResponse.Result == RCC.Result.OK ? "SUCCEED." : "FAILED."));
                 }
+                if (ImageReady != null)
+                {
+                    ImageReady(this, new ImageReadyEventArgs(fileName));
+                }
+
                 return;
             }
-
-            ////ExecuteCommand(string.Format("--file_format dng -o {0} --iso {1} --shutter_speed {2}", fileName + ".dng", Iso, Duration));
-            ////pktriggercord-cli --file_format dng -o c:\temp\test.dng -i 400 -t 1
-            //Logger.WriteTraceMessage("--file_format dng -o " + fileName + ".dng -i " + Iso + " -t " + Duration);
-            //ExecuteCommand(string.Format("--file_format dng -o {0} -i {1} -t {2}", fileName + ".dng", Iso, Duration));
 
         }
 
@@ -519,68 +501,7 @@ namespace ASCOM.DSLR.Classes
 
         }
 
-        private string GetAppPath()
-        {
-            string AppPath;
-            AppPath = Assembly.GetExecutingAssembly().Location;
-            AppPath = Path.GetDirectoryName(AppPath);
 
-            return AppPath;
-        }
-
-        private Dictionary<string, string> ParseStatus(string status)
-        {
-            var result = new Dictionary<string, string>();
-
-            using (StringReader sr = new StringReader(status))
-            {
-                string line;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    var parts = line.Split(':').Select(p => p.Trim()).ToList();
-                    if (parts.Count == 2)
-                    {
-                        result.Add(parts[0], parts[1]);
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        public string ExecuteCommand(string args)
-        {
-            Logger.WriteTraceMessage("ExecuteCommand(), args = '" + args + "'");
-
-            string exeDir = Path.Combine(GetAppPath(), "pktriggercord", "pktriggercord-cli.exe");
-            ProcessStartInfo procStartInfo = new ProcessStartInfo();
-
-            procStartInfo.FileName = exeDir;
-            procStartInfo.Arguments = args + " --timeout 10";
-            procStartInfo.RedirectStandardOutput = true;
-            procStartInfo.UseShellExecute = false;
-            procStartInfo.CreateNoWindow = true;
-            Logger.WriteTraceMessage("about to start process with command = '" + procStartInfo.FileName + " " + procStartInfo.Arguments + "'");
-
-            string result = string.Empty;
-            using (Process process = new Process())
-            {
-                process.StartInfo = procStartInfo;
-                process.Start();
-                process.WaitForExit();
-
-                result = process.StandardOutput.ReadToEnd();
-                Logger.WriteTraceMessage("result of command = '" + result + "'");
-            }
-            //result = "pktriggercord-cli: K-5IIs Connected...";
-            return result;
-        }
-
-        private void CallExposureFailed(string message, string stackTrace = null)
-        {
-            _waitingForImage = false;
-            ExposureFailed?.Invoke(this, new ExposureFailedEventArgs(message, stackTrace));
-        }
 
         public void StopExposure()
         {
