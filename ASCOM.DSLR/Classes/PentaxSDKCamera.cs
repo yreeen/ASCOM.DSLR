@@ -195,6 +195,7 @@ namespace ASCOM.DSLR.Classes
         //TODO カメラが対応していないシャッタースピードやISOではエラーを返すようにする
         private RCC.ISO int2iso(int iso)
         {
+            if (iso < 100) iso = 100;
             if (_IsoMap.ContainsKey(iso))
                 return _IsoMap[iso];
             throw new InvalidValueException("ISO " + iso + " is not supported. int2iso();");
@@ -251,12 +252,12 @@ namespace ASCOM.DSLR.Classes
         public PentaxSDKCamera(List<CameraModel> cameraModelsHistory) : base(cameraModelsHistory)
         {
             ScanCameras();
-            ConnectCamera();
         }
 
         public event EventHandler<ImageReadyEventArgs> ImageReady;//DNGデータが得られたら呼ぶ
         public event EventHandler<ExposureFailedEventArgs> ExposureFailed;//撮像失敗したら呼ぶ
         public event EventHandler<LiveViewImageReadyEventArgs> LiveViewImageReady;//ニコンのコードを参考にすれば実装できる気がする
+        private bool _liveViewEnabled = false;
 
         private RCC.DeviceInterface _deviceInterface = RCC.DeviceInterface.USB;
 
@@ -300,6 +301,11 @@ namespace ASCOM.DSLR.Classes
         public void AbortExposure()
         {
             if (_connectedCameraDevice == null) return;
+            if (_liveViewEnabled)
+            {
+                _connectedCameraDevice.StopLiveView();
+                _liveViewEnabled = false;
+            }
             RCC.Response response = _connectedCameraDevice.StopCapture();
             Logger.WriteTraceMessage("AbortExposure(); called. response is " + response.Result.ToString());
         }
@@ -329,7 +335,8 @@ namespace ASCOM.DSLR.Classes
             //SimpleISOListに使用可能なISO値を追加する。ただし、short型での実装なのでISO32000までしか登録してはいけない。
             var iso = new RCC.ISO();
             var ss = new RCC.ShutterSpeed();
-            _connectedCameraDevice.GetCaptureSettings(new List<RCC.CaptureSetting>() { iso ,ss});
+            _connectedCameraDevice.GetCaptureSettings(new List<RCC.CaptureSetting>() { iso ,ss,});
+
             SimpleISOList = null;
             SimpleISOList = new List<short>();
             foreach(var i in iso.AvailableSettings)
@@ -337,7 +344,7 @@ namespace ASCOM.DSLR.Classes
                 if (i == RCC.ISO.Auto)
                     continue;
                 int value = System.Convert.ToInt32(i.Value.ToString());
-                if (value > 32000) continue;
+                if (value > 32000) continue;//privent over flow.
                 SimpleISOList.Add((short)value);
 
             }
@@ -356,11 +363,25 @@ namespace ASCOM.DSLR.Classes
                 //                double d = ss2double(s);
 
             }
+
+            //get live-view image size.
+            var lv = new RCC.LiveViewSpecification();
+            _connectedCameraDevice.GetCameraDeviceSettings(new List<RCC.CameraDeviceSetting>() { lv });
+            //{Image: 720x480, FocusArea: (0.1, 0.166666)(0.9, 0.166666)(0.9, 0.833333)(0.1, 0.833333)} k1mk2 result.
+            //this parser was checked only K-1 MarkII.
+            string lvstr = lv.Value.ToString();
+            lvstr = lvstr.Substring(0, lvstr.IndexOf(","));
+            lvstr = lvstr.Substring(lvstr.IndexOf(" "));
+            LvFrameHeight = System.Convert.ToInt32(lvstr.Substring(lvstr.IndexOf("x") + 1));
+            LvFrameWidth = System.Convert.ToInt32(lvstr.Substring(0, lvstr.IndexOf("x")));
+
         }
 
         public void DisconnectCamera()
         {
             if (_connectedCameraDevice == null) return;
+            if (_liveViewEnabled) _connectedCameraDevice.StopLiveView();
+            _connectedCameraDevice.EventListeners.Clear();
             RCC.Response resoponse = _connectedCameraDevice.Disconnect(_deviceInterface);
             _connectedCameraDevice = null;            
         }
@@ -433,21 +454,19 @@ namespace ASCOM.DSLR.Classes
                                 //     Console.WriteLine("Error Code: " + error.Code.ToString() + " / Error Message: " + error.Message);
                             }
                             fs.Close();
-                            throw new Exception("image data cannot write into file.");
+                            throw new InvalidOperationException("image data cannot write into file.");
                         }
                     }
                     pentaxSDKCamera.ImageReady?.Invoke(pentaxSDKCamera, new ImageReadyEventArgs(fileName));
                 }
-                //else if (pentaxSDKCamera.ImageFormat == ImageFormat.JPEG)
-                //{
-
-                //    using (MemoryStream ms = new MemoryStream())
-                //    {
-                //        var imageGetResponse = image.GetData(ms);
-
-                //        pentaxSDKCamera.LiveViewImageReady?.Invoke(pentaxSDKCamera,new LiveViewImageReadyEventArgs(new System.Drawing.Bitmap(ms)));
-                //    }
-                //}
+            }
+            public override void LiveViewFrameUpdated(RCC.CameraDevice sender, byte[] liveViewFrame)
+            {
+                using (var ms = new MemoryStream(liveViewFrame)) 
+                {
+                    var bitmap = new System.Drawing.Bitmap(ms);
+                    pentaxSDKCamera.LiveViewImageReady?.Invoke(pentaxSDKCamera, new LiveViewImageReadyEventArgs(bitmap));
+                } 
             }
         }
 
@@ -455,26 +474,42 @@ namespace ASCOM.DSLR.Classes
         {
             Logger.WriteTraceMessage("PentaxSDKCamera.StartExposure(Duration, Light), duration ='" + Duration.ToString() + "', Light = '" + Light.ToString() + "'");
 
-            string fileName = StorePath + GetFileName(Duration, DateTime.Now) + ".dng";
-
             //Iso,Durationを設定する
             var iso = int2iso(Iso);
             var shutterspeed = double2ss(Duration);
-            _connectedCameraDevice.SetCaptureSettings(new List<RCC.CaptureSetting>() {iso,shutterspeed });
-            RCC.StartCaptureResponse startCaptureResponse = _connectedCameraDevice.StartCapture(false);
-            if(startCaptureResponse.Result == RCC.Result.Error)
+            _connectedCameraDevice.SetCaptureSettings(new List<RCC.CaptureSetting>() { iso, shutterspeed });
+            
+            if (IsLiveViewMode)
             {
-                if (ExposureFailed != null) ExposureFailed(this, new ExposureFailedEventArgs(""));
+                if (!_liveViewEnabled)
+                {
+                    var StartLiveViewResponse = _connectedCameraDevice.StartLiveView();
+
+                    if(StartLiveViewResponse.Result == RCC.Result.Error)//try again.
+                    {
+                        Task.WaitAll( Task.Delay(300));
+                        StartLiveViewResponse = _connectedCameraDevice.StartLiveView();
+                    }
+
+                    if (StartLiveViewResponse.Result == RCC.Result.OK)
+                        _liveViewEnabled = true;
+                    else
+                        _liveViewEnabled = false;
+                }
+
             }
+            else
+            {
 
-                return;
 
+                RCC.StartCaptureResponse startCaptureResponse = _connectedCameraDevice.StartCapture(false);
+                if (startCaptureResponse.Result == RCC.Result.Error)
+                {
+                    if (ExposureFailed != null) ExposureFailed(this, new ExposureFailedEventArgs(""));
+                }
+            }
+            return;
         }
-
-
-        FileSystemWatcher watcher;
-
-
 
         public void StopExposure()
         {
