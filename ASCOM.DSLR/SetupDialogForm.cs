@@ -281,8 +281,8 @@ namespace ASCOM.DSLR
             }else if (isPentaxSDK)
             {
                 chkEnableLiveView.Visible = true;
-                lblLiveViewZoom.Visible = false;
-                cbLiveViewZoom.Visible = false;
+                lblLiveViewZoom.Visible = true;
+                cbLiveViewZoom.Visible = true;
             }
             else
             {

@@ -68,7 +68,8 @@ namespace ASCOM.DSLR
             }else if(_cameraSettings.IntegrationApi == ConnectionMethod.PentaxSDK)
             {
                 _dslrCamera = new PentaxSDKCamera(_cameraSettings.CameraModelsHistory);
-//                _dslrCamera.IsLiveViewMode = _cameraSettings.LiveViewCaptureMode;
+                _dslrCamera.IsLiveViewMode = _cameraSettings.LiveViewCaptureMode;
+                _dslrCamera.LiveViewZoom = _cameraSettings.LiveViewZoom;
             }
         }
 
