@@ -278,6 +278,11 @@ namespace ASCOM.DSLR
                 chkEnableLiveView.Visible = true;
                 lblLiveViewZoom.Visible = true;
                 cbLiveViewZoom.Visible = true;
+            }else if (isPentaxSDK)
+            {
+                chkEnableLiveView.Visible = true;
+                lblLiveViewZoom.Visible = false;
+                cbLiveViewZoom.Visible = false;
             }
             else
             {
@@ -285,10 +290,6 @@ namespace ASCOM.DSLR
                 chkEnableLiveView.Visible = false;
                 lblLiveViewZoom.Visible = false;
                 cbLiveViewZoom.Visible = false;
-            }
-            if(isPentaxSDK)
-            {
-                chkEnableLiveView.Visible = true;
             }
         }
 

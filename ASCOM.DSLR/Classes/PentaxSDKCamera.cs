@@ -248,12 +248,6 @@ namespace ASCOM.DSLR.Classes
             throw new InvalidValueException("SS " + ss.ToString() + " is not supported. ss2double();");
         }
 
-        //private bool _waitingForImage = false;
-        //private DateTime _exposureStartTime;
-        //private const int timeout = 60;
-        //private double _lastDuration;
-        //private string _lastFileName;
-
         public PentaxSDKCamera(List<CameraModel> cameraModelsHistory) : base(cameraModelsHistory)
         {
             ScanCameras();
@@ -348,10 +342,20 @@ namespace ASCOM.DSLR.Classes
 
             }
 
-            //使用可能なシャッタースピードのリストを取得するコードをそのうち書く いらないかも？
-//            TvList = null;
-//            TvList = new List<>
+            //使用可能なシャッタースピードのリストを取得するコードをそのうち書く
+            //そして、double2ssで本体が対応しない設定が出力されないようにすること
+            var ssList = new List<EOSDigital.API.CameraValue>();
+            var testlist = new List<string>();
+            foreach (var s in ss.AvailableSettings)
+            {
+                var strss = s.Value.ToString();
+                testlist.Add(strss);
 
+                if (s == RCC.ShutterSpeed.Auto)
+                    continue;
+                //                double d = ss2double(s);
+
+            }
         }
 
         public void DisconnectCamera()
@@ -452,8 +456,6 @@ namespace ASCOM.DSLR.Classes
             Logger.WriteTraceMessage("PentaxSDKCamera.StartExposure(Duration, Light), duration ='" + Duration.ToString() + "', Light = '" + Light.ToString() + "'");
 
             string fileName = StorePath + GetFileName(Duration, DateTime.Now) + ".dng";
- //           MarkWaitingForExposure(Duration, fileName);
- //           watch();
 
             //Iso,Durationを設定する
             var iso = int2iso(Iso);
@@ -464,97 +466,13 @@ namespace ASCOM.DSLR.Classes
             {
                 if (ExposureFailed != null) ExposureFailed(this, new ExposureFailedEventArgs(""));
             }
-            //while(startCaptureResponse.Capture.State == RCC.CaptureState.Executing)Task.Delay(10);
-            //using(FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
-            //{
-            //        while(_connectedCameraDevice.Images.Count() == 0);
-            //        int i = 0;
-            //        bool flag = false;
-            //        for(;i < _connectedCameraDevice.Images.Count();++i)
-            //        {
-            //            if (_connectedCameraDevice.Images[i].Format == RCC.ImageFormat.DNG)
-            //            {
-            //                flag = true;
-            //                break;
-            //            }
-            //        }
-            //        if(!flag)
-            //        {
-            //            fs.Close();
-            //            Logger.WriteTraceMessage("StartExposure(); Failed. check camera setting. Is Law mode DNG?");
-            //            throw new ASCOM.InvalidOperationException("StartExposure(); Failed. check camera setting. Is Law mode DNG?");
-            //        }
-            //        RCC.CameraImage image = _connectedCameraDevice.Images[i];
-            //        RCC.Response imageGetResponse = image.GetData(fs);
-            //        fs.Close();
-            //        Logger.WriteTraceMessage("StartExposure(); called. image.GetData() is " + (imageGetResponse.Result == RCC.Result.OK ? "SUCCEED." : "FAILED."));
-            //    }
-            //    if (ImageReady != null)
-            //    {
-            //        ImageReady(this, new ImageReadyEventArgs(fileName));
-            //    }
 
                 return;
 
         }
 
-        //private string _fileNameWaiting;
-
-
-        //private void MarkWaitingForExposure(double Duration, string fileName)
-        //{
-        //    _exposureStartTime = DateTime.Now;
-        //    _lastDuration = Duration;
-        //    _waitingForImage = true;
-        //    _fileNameWaiting = fileName;
-        //}
 
         FileSystemWatcher watcher;
-
-        //private void watch()
-        //{
-        //    if (!Directory.Exists(StorePath))
-        //    {
-        //        Directory.CreateDirectory(StorePath);
-        //    }
-
-        //    watcher = new FileSystemWatcher();
-        //    watcher.Path = StorePath;
-        //    watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
-        //                           | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-        //    watcher.Filter = "*.dng";
-        //    watcher.Changed += new FileSystemEventHandler(OnChanged);
-        //    watcher.EnableRaisingEvents = true;
-
-        //    Logger.WriteTraceMessage("watch " + StorePath);
-        //}
-
-        //private void OnChanged(object source, FileSystemEventArgs e)
-        //{
-        //    var fileName = e.FullPath;
-
-        //    Logger.WriteTraceMessage("onchanged " + fileName);
-
-        //    var destinationFilePath = Path.ChangeExtension(Path.Combine(StorePath, Path.Combine(StorePath, _fileNameWaiting)), "-.dng");
-
-        //    Logger.WriteTraceMessage("onchanged dest " + destinationFilePath);
-
-        //    File.Copy(fileName, destinationFilePath);
-        //    File.Delete(fileName);
-        //    if (ImageReady != null)
-        //    {
-        //        ImageReady(this, new ImageReadyEventArgs(destinationFilePath));
-        //    }
-        //    watcher.Changed -= OnChanged;
-        //    watcher.EnableRaisingEvents = false;
-        //    watcher = null;
-
-        //    if ((File.Exists(destinationFilePath)) && (SaveFile == false))
-        //    {
-        //        File.Delete(destinationFilePath);
-        //    }
-
-        //}
 
 
 
