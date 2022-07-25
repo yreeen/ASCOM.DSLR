@@ -119,7 +119,7 @@ namespace ASCOM.DSLR.Classes
 
         public int[,,] ReadBitmap(Bitmap img)
         {
-           
+
             BitmapData data = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadOnly, img.PixelFormat);
             IntPtr ptr = data.Scan0;
             int bytesCount = Math.Abs(data.Stride) * img.Height;

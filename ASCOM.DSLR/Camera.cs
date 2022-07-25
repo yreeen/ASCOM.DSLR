@@ -320,7 +320,11 @@ namespace ASCOM.DSLR
 
         private void PrepareCameraImageArray(string rawFileName)
         {
-
+            if (cameraImageArray != null)
+            {
+                cameraImageArray = null;
+                System.GC.Collect(); 
+            }
             if (CameraSettings.CameraMode == Enums.CameraMode.Color16)
             {
                 cameraImageArray = _imageDataProcessor.ReadAndDebayerRaw(rawFileName);
