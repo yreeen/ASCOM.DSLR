@@ -221,6 +221,9 @@ Source: "bin\SDK\X86\Nikon\D60_Mod\D40_Mod.md3"; DestDir: "{app}\SDK\X86\Nikon\D
 Source: "bin\SDK\X86\Nikon\D80_Mod\D80_Mod.md3"; DestDir: "{app}\SDK\X86\Nikon\D80_Mod\"
 Source: "bin\SDK\X86\Nikon\D200_Mod\D200_Mod.md3"; DestDir: "{app}\SDK\X86\Nikon\D200_Mod\"
 
+;RICHO Camera SDK for some PENTAX cameras
+Source: "bin\RicohCameraSDK.dll"; DestDir:"{app}"
+
 Source: "bin\ASCOM.DSLR.Test.exe"; DestDir: "{app}"
 
 ;VC Runtime 2019
