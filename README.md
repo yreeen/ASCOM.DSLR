@@ -9,7 +9,7 @@ What license is the code being released under?
 The code is being released under GPL v3 and GPL v3 compatible licenses. Means if out use this part of your aplication you need to release the source code of you aplication.
 
 Technologies:
-The project uses C#, DigicamControl for Old Nikon Cameras, Nikoncswrapper for newer nikon cameras, CanonSDK, pktriggercord, Libraw and Innosetup
+The project uses C#, DigicamControl for Old Nikon Cameras, Nikoncswrapper for newer nikon cameras, CanonSDK, pktriggercord, RicohCameraSDK, Libraw and Innosetup
 
 The Drivers is supported As-Is we not responsible for damages in your camera.
 
