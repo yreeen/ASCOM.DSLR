@@ -60,3 +60,5 @@ Release Notes
 6/27/2020 - Added utility to clean SC DSLR camera profile in order to avoid issues changing LiveView<>Frame modes. (PLease read the instruction on Wiki Page)
 
 7/7/2020 - updated the ClearDSLRSCProfile to clear COMM error without need to reboot the machine.
+
+7/25/2022 - RICOH Camera SDK implemented (PentaxSDKCamera). (Tested with PENTAX K-1 markII)
