@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Logging;
 using RCC = Ricoh.CameraController;
+using System.IO.Ports;
 
 namespace ASCOM.DSLR.Classes
 {
@@ -588,38 +589,100 @@ namespace ASCOM.DSLR.Classes
         public void StartExposure(double Duration, bool Light)
         {
             Logger.WriteTraceMessage("PentaxSDKCamera.StartExposure(Duration, Light), duration ='" + Duration.ToString() + "', Light = '" + Light.ToString() + "'");
-
             var iso = int2iso(Iso);
             var shutterspeed = double2ss(Duration);
-            _connectedCameraDevice.SetCaptureSettings(new List<RCC.CaptureSetting>() { iso, shutterspeed });
-            
-            if (IsLiveViewMode)
+
+            //RICOH Camera SDK 1.10
+            // IS NOT SUPPORT BULB CAPTURE!!!!!
+
+            //var exposureProgram = new RCC.ExposureProgram();
+            //_connectedCameraDevice.GetCaptureSettings(new List<RCC.CaptureSetting> { exposureProgram });
+
+            //if (exposureProgram.Equals(RCC.ExposureProgram.Bulb) && IsLiveViewMode == false)
+            //{ 
+            //    _connectedCameraDevice.SetCaptureSettings(new List<RCC.CaptureSetting>() {iso, RCC.ShutterSpeed.Bulb });
+
+            //    RCC.StartCaptureResponse startCaptureResponse = _connectedCameraDevice.StartCapture(false);
+            //    if (startCaptureResponse.Result == RCC.Result.Error)
+            //    {
+            //        if (ExposureFailed != null) ExposureFailed(this, new ExposureFailedEventArgs(""));
+            //        return;
+            //    }
+            //    Thread.Sleep(TimeSpan.FromSeconds(Duration));
+            //    StopExposure();
+            //    return;
+            //}
+            if (Duration > 30)
             {
-                if (!_liveViewEnabled)
+                //Bulbモードになってるか確認
+                //なってれば外部シャッターのシリアルポート越しにシャッターを切る
+                var mode = new RCC.ExposureProgram();
+                _connectedCameraDevice.GetCaptureSettings(new List<RCC.CaptureSetting>() { mode});
+                if(mode == RCC.ExposureProgram.Manual)
                 {
-                    var StartLiveViewResponse = _connectedCameraDevice.StartLiveView();
+                    //外部シャッターでの撮影を試みる
+                    ThreadPool.QueueUserWorkItem(
+                        state => 
+                        {
+                            SerialPort sp = new SerialPort(ExternalShutterPort,9600,Parity.None,8,StopBits.One);
+                            try
+                            {
+                                sp.Open();
+                                Thread.Sleep(100);
+                                sp.Write(":Eb#");
+                                Thread.Sleep((int)(Duration * 1000));
+                                sp.Write(":Ee#");
+                                sp.Close();
+                            }
+                            catch(Exception ex)
+                            {
+                                System.Windows.Forms.MessageBox.Show(ex.Message);
+                            }
+                        });
+                }
+                else
+                {
+                    System.Windows.Forms.MessageBox.Show("Set exposure program as Bulb.");
 
-                    if(StartLiveViewResponse.Result == RCC.Result.Error)//try again.
-                    {
-                        Task.WaitAll( Task.Delay(300));
-                        StartLiveViewResponse = _connectedCameraDevice.StartLiveView();
-                    }
-
-                    if (StartLiveViewResponse.Result == RCC.Result.OK)
-                        _liveViewEnabled = true;
-                    else
-                        _liveViewEnabled = false;
+                    return;
                 }
 
             }
             else
             {
+                if (Duration >= 30.0)
+                    shutterspeed = RCC.ShutterSpeed.SS30;
+                _connectedCameraDevice.SetCaptureSettings(new List<RCC.CaptureSetting>() { iso, shutterspeed });
 
 
-                RCC.StartCaptureResponse startCaptureResponse = _connectedCameraDevice.StartCapture(false);
-                if (startCaptureResponse.Result == RCC.Result.Error)
+                if (IsLiveViewMode)
                 {
-                    if (ExposureFailed != null) ExposureFailed(this, new ExposureFailedEventArgs(""));
+                    if (!_liveViewEnabled)
+                    {
+                        var StartLiveViewResponse = _connectedCameraDevice.StartLiveView();
+
+                        if (StartLiveViewResponse.Result == RCC.Result.Error)//try again.
+                        {
+                            Task.WaitAll(Task.Delay(300));
+                            StartLiveViewResponse = _connectedCameraDevice.StartLiveView();
+                        }
+
+                        if (StartLiveViewResponse.Result == RCC.Result.OK)
+                            _liveViewEnabled = true;
+                        else
+                            _liveViewEnabled = false;
+                    }
+
+                }
+                else
+                {
+
+
+                    RCC.StartCaptureResponse startCaptureResponse = _connectedCameraDevice.StartCapture(false);
+                    if (startCaptureResponse.Result == RCC.Result.Error)
+                    {
+                        if (ExposureFailed != null) ExposureFailed(this, new ExposureFailedEventArgs(""));
+                    }
                 }
             }
             return;
